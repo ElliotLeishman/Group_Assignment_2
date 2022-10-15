@@ -30,7 +30,7 @@ pone <- function(n, k, strategy, nreps){
     }
   }
  count=count/nreps
- cat(count)
+ return (count)
 }
 
   
@@ -49,5 +49,36 @@ pall <-  function(n, strategy, nreps){
     }
   }
   count_all=count_all/nreps
-  cat(count_all)
+  return (count_all)
 }  
+
+
+
+dloops <- function(n,nreps){
+  p=rep(0,2*n)
+  nloops=0
+  for (i in 1:nreps){
+    b <- sample(1:(2*n), 2 * n, replace = FALSE)
+    I=list()
+    for (k in 1:(2*n)){
+      l=1
+      s=b[k]
+      if (s==k){
+        nloops=nloops+1
+        p[l]=p[l]+1
+      }
+      else if (!s%in%I){
+        while (s!=k){
+          l=l+1
+          I=append(I,s)
+          s=b[s]
+        }
+        nloops=nloops+1
+        p[l]=p[l]+1
+      }
+    }
+  }
+  p=p/nloops
+  return (p)
+  cat(p)
+}
