@@ -63,22 +63,25 @@ dloops <- function(n,nreps){
     for (k in 1:(2*n)){
       l=1
       s=b[k]
-      if (s==k){
-        nloops=nloops+1
-        p[l]=p[l]+1
-      }
-      else if (!s%in%I){
-        while (s!=k){
-          l=l+1
+      if (!s%in%I){
+        if (s==k){
           I=append(I,s)
-          s=b[s]
+          nloops=nloops+1
+          p[l]=p[l]+1
         }
-        nloops=nloops+1
-        p[l]=p[l]+1
+        else{
+          while (s!=k){
+            l=l+1
+            I=append(I,s)
+            s=b[s]
+          }
+          nloops=nloops+1
+          p[l]=p[l]+1
+        }
       }
     }
   }
-  p=p/nloops
+  #p=p/nloops
   return (p)
   cat(p)
 }
