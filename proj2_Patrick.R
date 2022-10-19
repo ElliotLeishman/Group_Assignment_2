@@ -96,7 +96,7 @@ dloops <- function(n,nreps){
     for (i in 2:(2*n)){
       s[i] <- b[s[i-1]]
       if(s[i]==b[1]){
-        p[sum(!is.na(s))]<-p[sum(!is.na(s))]+1
+        p[sum(!is.na(s))-1]<-p[sum(!is.na(s))-1]+1
         break
       }
     }
