@@ -88,5 +88,5 @@ dloops <- function(n,nreps){
   return (p)
   cat(p)
 }
-
-
+b <-sample(1:(200), 200, replace = FALSE)
+b
