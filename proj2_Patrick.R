@@ -104,7 +104,7 @@ dloops <- function(n,nreps){
     s=array(NA,c(2*n,2*n))
     b <- sample(1:(2*n), 2*n, replace = FALSE)
     for (j in b)
-      if (check(j,s[j,])==0){
+      if (check(j,s)==0){
         s[j,1] <- b[j]
         for (i in 2:(2*n)){
           s[j,i] <- b[s[j,i-1]]
@@ -123,7 +123,7 @@ dloops <- function(n,nreps){
 
   return(p_len)
 }
-p <- dloops(50,1000)
+p <- dloops(50,10000)
 p1 <- p[1:100]
 p1
 scatter.smooth(1:100,p1)
