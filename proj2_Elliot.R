@@ -1,5 +1,33 @@
-## Need an introduction describing the script/ problem, also should describe
-## each strategy
+## Statistical Programming, Practical 2
+## Github repo: https://github.com/ElliotLeishman/Group_Assignment_2.git
+## Christos Giannikos (s2436019), Elliot Leishman (s1808740), 
+## Patrick Renaud (s2462989)
+
+## We have 2n prisoners’ number between 1 and 2n. Each prisoner enters a room 
+## filled with 2n boxes, each boxes in turn has a number between 1 and 2n inside 
+## it. Each prisoner gets to choose n boxes, if every prisoner chooses a box 
+## containing their own number all prisoners go free. In this assignment we 
+## investigate the effect different strategies for picking the boxes has on the 
+## probability that the prisoners all go free. 
+## Specifically, we investigate the following three strategies:
+## 1: Each prisoner starts with the box corresponding to their number, eg. The 
+## first prisoner will open the first box. If the number inside this box is the 
+## prisoners’ number then the prisoner has found their number. If it isn’t they 
+## move to the box corresponding to that number. This is repeated until the 
+## prisoner has selected n boxes.
+## 2: Exactly the same as strategy 1 but each prisoner starts with a random box.
+## 3: Each prisoner chooses n boxes at random.
+
+##General Outline: 
+## We define a function called Box_Choice which returns the box choices a 
+## prisoner will make depending on the strategy they have chosen. Next, we 
+## define a check function which simply checks if a vector contains a specific 
+## determined element. We then define a function Pone which determines the 
+## probability an individual prisoner will find their number given a strategy. 
+## Function Pall then determines the probability that all prisoners go free. 
+## Finally, we define a function dloops to investigate the presence of
+## loops in …
+
 
 
 Box_Choice <- function(n, k, box_values, strategy){
@@ -13,9 +41,9 @@ Box_Choice <- function(n, k, box_values, strategy){
   ## The function outputs a vector, named choice, of n numbers between 1 and 2n 
   ## inclusive which have been chosen by following the indicated strategy.
   
-  choice <- 1:n # Feel like this should be filled with zeros
-  if (strategy == 1){
-    choice[1] <- box_values[k]
+  choice <- array(0, c(n)) ## Intialise choice vector
+  if (strategy == 1){ ## Strategy 1
+    choice[1] <- box_values[k] ## Sets first element as the number in box k.
     for (i in 2:n){
       choice[i] <- box_values[choice[i-1]]
     }
@@ -29,7 +57,8 @@ Box_Choice <- function(n, k, box_values, strategy){
     }
   }
   if (strategy == 3){
-    choice <- sample(1:(2*n),n, replace = FALSE)
+    choice <- sample(1:(2*n),n, replace = FALSE) ## Generates n random integers 
+    ## between 1 and 2n.
   }
   return(choice)
 }
@@ -39,35 +68,112 @@ check <- function(k, a){
   if (k %in% a){return(1)}
   else{return(0)}
 }
-# test cases
-check(3, c(3,4,6,8,0,3)); check(-1, c(3,1,4,6,8,0,3))
 
 
 Pone <- function(n, k, strategy, nreps){
-  count <- 0
-  for (i in nreps){
-    box_values <- sample(1:(2 * n), 2 * n, replace = FALSE) # Add to next line?
-    count <- count + check(k, Box_Choice(n, k, box_values, strategy))
+  ## Function which runs a stochastic model to estimate the probability one
+  ## prisoner finds their number. Its inputs are:
+  ##    n - number of boxes opened by prisoner,
+  ##    k - prisoner number,
+  ##    strategy - strategy deployed by prisoner,
+  ##    nreps - number of times we run stochastic model.
+  ## It outputs a real number.
+  count <- 0 ## Initialise counter
+  for (i in 1:nreps){
+    box_values <- sample(1:(2 * n), 2 * n, replace = FALSE) ## Generates the 
+    ## numbers in each box randomly.
+    count <- count + check(k, Box_Choice(n, k, box_values, strategy)) ## If the 
+    ## vector returned by the Box_Choice function contains the prisoners number
+    ## we add one to the counter.
   }
+  return(count/nreps)
 }
-# test cases
-pone(50, 33, 1, 5); pone(50, 4, 2, 100); pone(50, 4, 3, 100);
 
 
-
-pall <- function(n, strategy, nreps){
-  A <- array(0, c(nreps, 2 * n))
+Pall <- function(n, strategy, nreps){
+  ## Function runs a stochastic simulation to estimate the probability that all 
+  ## prisoners find their number and hence are released. It has the inputs n, 
+  ## strategy and nreps, which are already defined in previous functions. It
+  ## returns a real number between 0 and 1.
+  ## It works by first initialising a zero array of dimensions nreps x 2n. Then
+  ## generating the numbers inside each box, since these numbers should be same 
+  ## for all prisoners in each simulation. We then replace the entries of the
+  ## array using the check and Box_Choice functions to store data on if each
+  ## prisoner finds their number. We then manipulate this data to return the 
+  ## probability.
+  
+  
+  A <- array(0, c(nreps, 2 * n)) ## Set up empty array.
   for (i in 1:nreps){
     box_values <- sample(1:(2 * n), 2 * n, replace = FALSE)
     for (k in 1:(2 * n)){
       A[i,k] <- check(k, Box_Choice(n, k, box_values, strategy))
     }
   }
-  x <- apply(A, 1, sum) # Sum rows 
-  x <- match(x, 2 * n)  # Finds entries equalling 2n
-  x <- x[which(x!="NA")]# Remove NAs
+  x <- apply(A, 1, sum) ## Sum rows 
+  x <- match(x, 2 * n)  ## Finds entries equalling 2n, these are the ones where 
+  ## all prisoners find their number.
+  x <- x[which(x!="NA")]## Remove NAs
   return(length(x)/ nreps)
 }
 
-# test cases
+## We now estimate the probability a prisoner finds their number by running the
+## function Pone, for each strategy, first for n = 5. 
+Pone(5, 1, 1, 1000) ;Pone(5, 1, 2, 1000);Pone(5, 1, 3, 1000)
+## and then for n = 50.
+Pone(50, 1, 1, 1000);Pone(50, 1, 2, 1000);Pone(50, 1, 3, 1000)
+## We have set k = 1 as the choice of k is arbitrary and will not affect the 
+## probabilities.
+
+## Now we estimate the joint probability all prisoners are freed by running the
+## function Pall, for each strategy, again for n = 5 and n = 50.
+pall(5, 1, 1000);pall(5, 2, 1000);pall(5, 3, 1000)
 pall(50, 1, 1000);pall(50, 2, 1000);pall(50, 3, 1000)
+
+
+## The results from running the function suggest that all three strategies give 
+## approximately the same chance of suggest for one prisoner. However, rather 
+## surprisingly, for all the prisoners to achieve success, the first strategy is 
+## much better at around 33% chance of success. We hypothesise this is due to 
+## this method not being truly independent since the prisoners all start at the 
+## box predetermined by their number. 
+
+## It is worth pointing out that if strategies 2 and 3 are indeed independent as 
+## the simulation would suggest, the joint probability of two prisoners being 
+## set free (ie n=1) is 0.5^2 or 0.25. This is less than the probability of 100 
+##prisoners being released if they follow strategy 1.
+
+dloops <- function(n,nreps){
+  p=array(0,2*n)
+  for (h in 1:nreps){
+    s=array(NA,c(2*n,2*n))
+    b <- sample(1:(2*n), 2*n, replace = FALSE)
+    for (j in b)
+      if (check(j,s)==0){
+        s[j,1] <- b[j]
+        for (i in 2:(2*n)){
+          s[j,i] <- b[s[j,i-1]]
+          if(s[j,i]==b[j]){
+            p[sum(!is.na(s[j,]))-1]<-p[sum(!is.na(s[j,]))-1]+1
+            break
+          }
+        }
+        if (s[j,i]!=b[j]){
+          p[length(s[j,])]<-p[length(s[j,])]+1
+        }
+      }
+  }
+  print(p[1:100])
+  p_len<-p[1:100]/sum(p[1:100])
+  
+  return(p_len)
+}
+p <- dloops(50,1000)
+
+scatter.smooth(1:100,p1)
+
+
+##Q6
+p
+1/(1 - sum(p[50:100])
+   
