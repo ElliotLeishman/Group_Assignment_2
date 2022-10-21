@@ -3,7 +3,7 @@
 ## Christos Giannikos (s2436019), Elliot Leishman (s1808740), 
 ## Patrick Renaud (s2462989)
 
-## We have 2n prisoners’ number between 1 and 2n. Each prisoner enters a room 
+## We have 2n prisoners’ numbered between 1 and 2n. Each prisoner enters a room 
 ## filled with 2n boxes, each boxes in turn has a number between 1 and 2n inside 
 ## it. Each prisoner gets to choose n boxes, if every prisoner chooses a box 
 ## containing their own number all prisoners go free. In this assignment we 
@@ -26,7 +26,8 @@
 ## probability an individual prisoner will find their number given a strategy. 
 ## Function Pall then determines the probability that all prisoners go free. 
 ## Finally, we define a function dloops to investigate the presence of
-## loops in …
+## loops in a random shuffling of boxes and then find the probability of each
+## loop length 1:2n occurring at least once per shuffling.
 
 
 
@@ -127,8 +128,8 @@ Pone(50, 1, 1, 1000);Pone(50, 1, 2, 1000);Pone(50, 1, 3, 1000)
 
 ## Now we estimate the joint probability all prisoners are freed by running the
 ## function Pall, for each strategy, again for n = 5 and n = 50.
-pall(5, 1, 1000);pall(5, 2, 1000);pall(5, 3, 1000)
-pall(50, 1, 1000);pall(50, 2, 1000);pall(50, 3, 1000)
+Pall(5, 1, 1000);Pall(5, 2, 1000);Pall(5, 3, 1000)
+Pall(50, 1, 1000);Pall(50, 2, 1000);Pall(50, 3, 1000)
 
 
 ## The results from running the function suggest that all three strategies give 
@@ -143,37 +144,86 @@ pall(50, 1, 1000);pall(50, 2, 1000);pall(50, 3, 1000)
 ## set free (ie n=1) is 0.5^2 or 0.25. This is less than the probability of 100 
 ##prisoners being released if they follow strategy 1.
 
+
+
 dloops <- function(n,nreps){
-  p=array(0,2*n)
+  ## This function simulates the probabilities that a loop of 1 to 2n length
+  ## that can occur within one random shuffling of boxes. It takes the inputs n 
+  ## and nreps and returns an probability vector of length 2n (loop_freq). It 
+  ## first initialises a zero vector of length 2n and then for 1:nreps 
+  ## iterations will generate a 2n*2n empty matrix (loops) where we can store 
+  ## our found loops in order to avoid counting the same loop multiple times. 
+  ## It will then sample 2n values from 1:2n simulating the boxes (b). 
+  ## The function will then loop over each element of our sample (b) and search 
+  ## for loops within the sample. It will then store any loops found in our 
+  ## 2n*2n matrix and will count the number of times a loop of each length 
+  ## occurs in the (loop_freq) vector. Once the whole sample has been checked it
+  ## will start again and continue until nreps have been reached. To end, the 
+  ## function will then take the (loop_freq) vector and it will divide each 
+  ## element by the total number of loops which were found.
+  ## The function then returns us the probability vector, whose elements 
+  ## represent the probability with which loops of length 1:2n occur.
+  
+  
+  loop_freq=array(0,2*n) # Set up empty vector to count loop length frequency
+  
   for (h in 1:nreps){
-    s=array(NA,c(2*n,2*n))
+    loops=array(0,c(2*n,2*n)) # Set up empty vector to store loops
     b <- sample(1:(2*n), 2*n, replace = FALSE)
-    for (j in b)
-      if (check(j,s)==0){
-        s[j,1] <- b[j]
-        for (i in 2:(2*n)){
-          s[j,i] <- b[s[j,i-1]]
-          if(s[j,i]==b[j]){
-            p[sum(!is.na(s[j,]))-1]<-p[sum(!is.na(s[j,]))-1]+1
+    
+    for (j in b){
+      
+      if (check(b[j],loops)==0){ # Check if loop already exists in s
+        loops[j,1]<-b[j]
+       
+         for (i in 2:(2*n)){ # Initialise recursion
+          loops[j,i]<-b[loops[j,i-1]]
+          
+          if (loops[j,i]==b[j]){ # Check if new box is same as original box
+            loop_freq[i-1]<-loop_freq[i-1]+1
             break
           }
-        }
-        if (s[j,i]!=b[j]){
-          p[length(s[j,])]<-p[length(s[j,])]+1
+          
+          # If we reach 2n i without finding the first number again then the
+          # 2nth box must conatin the number for box 1 and so we have a loop
+          # of length 2n
+          if (loops[j,(2*n)]!=b[j] && loops[j,(2*n)]!=0){
+            loop_freq[(2*n)]<-loop_freq[(2*n)]+1
+          }
         }
       }
+    }
   }
-  print(p[1:100])
-  p_len<-p[1:100]/sum(p[1:100])
-  
-  return(p_len)
+  loop_prob<-loop_freq/sum(loop_freq) # Find probabilities from frequency
+  return(loop_prob) # Return the probability vector
 }
-p <- dloops(50,1000)
 
-scatter.smooth(1:100,p1)
+# Sample of probabilities for n=50 and 10000 nreps
+d<-dloops(50,10000)
+
+## Furthermore, we will try to access the probability of no loops longer than 
+## n=50 appearing in a random reshuffling of cards to boxes. This probability 
+## can be estimated by 1 minus the sum the estimated probabilities of observing 
+## a loop of length l, l=51,52,...,100 in a random shuffling of 100 cards, i.e.
+p_under_50=1-sum(d[51:100])
+p_under_50
+## This probability is equal to the probability that 100 prisoners succeed in 
+## finding their cards when acting under strategy 1, i.e pall(100,1,), since the
+## existence or not of a loop larger than n is what determines whether they 
+## succeed or not. As a result, we expect it to be close to 0.3333, since in 
+## theory it is equal to 1-(1/51+1/52+...+1/100)=1/3.
 
 
-##Q6
-p
-1/(1 - sum(p[50:100])
+## Finally, we will try to visualize the probabilities of p-under_50 that we 
+## calculated with a simple scatterplot
+## First, we create a data frame with the data we desire to visualize
+data = data.frame( x=1:100, y=d)
+
+## Basic scatterplot
+## We place on the x-axis the possible lengths of the loops in a random 
+## shuffling of 100 cards and on the y-axis the probabilities of observing 
+## loops of length l
+plot(data$x, data$y,
+     xlab="length of loops", ylab="probability of observation",
+     main="A simple visualizatuation")
    

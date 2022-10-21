@@ -96,34 +96,85 @@ check <- function(k, a){
 }
 
 
-
-
 dloops <- function(n,nreps){
   p=array(0,2*n)
   for (h in 1:nreps){
-    s=array(NA,c(2*n,2*n))
+    s=array(0,c(2*n,2*n))
     b <- sample(1:(2*n), 2*n, replace = FALSE)
-    for (j in b)
+    for (j in b){
       if (check(j,s)==0){
         s[j,1] <- b[j]
         for (i in 2:(2*n)){
           s[j,i] <- b[s[j,i-1]]
           if(s[j,i]==b[j]){
-            p[sum(!is.na(s[j,]))-1]<-p[sum(!is.na(s[j,]))-1]+1
+            p[i-1]<-p[i-1]+1
             break
           }
         }
         if (s[j,i]!=b[j]){
-          p[length(s[j,])]<-p[length(s[j,])]+1
+          p[(2*n)]<-p[(2*n)]+1
         }
       }
+    }
   }
-  print(p[1:100])
-  p_len<-p[1:100]/sum(p[1:100])
-
+  p_len<-p/sum(p)
+  print(p_len)
   return(p_len)
 }
+
 p <- dloops(50,10000)
-p1 <- p[1:100]
-p1
-scatter.smooth(1:100,p1)
+scatter.smooth(p)
+1-sum(p[51:100])
+sp<-sum(p[2:49])
+recp<-(1/p[1:100])
+recp
+1-sp
+1-(sum(1/p[1:100])-sum(1/p[1:50]))
+
+
+
+b <- sample(1:(100), 100, replace = FALSE)
+b
+
+
+
+
+
+
+
+
+dloops <- function(n,nreps){
+  p=array(0,2*n)
+  for (h in 1:nreps){
+    s=array(0,c(2*n,2*n))
+    b <- sample(1:(2*n), 2*n, replace = FALSE)
+    for (j in b){
+      if (check(b[j],s)==0){
+        s[j,1]<-b[j]
+        for (i in 2:(2*n)){
+          s[j,i]<-b[s[j,i-1]]
+          
+          if (s[j,i]==b[j]){
+            p[i-1]<-p[i-1]+1
+            break
+          }
+          if (s[j,(2*n)]!=b[j] && s[j,(2*n)]!=0){
+              p[(2*n)]<-p[(2*n)]+1
+          }
+        }
+      }
+    }
+  }
+  print(p)
+  p_prob<-p/sum(p)
+  return(p_prob)
+}
+
+d<-dloops(50,10000)
+sumd<-print(sum(d))
+dprob<- 1-(sum(d[1:50])-sum(d[51:100]))
+print(d[51:100])
+dprob
+
+
+
