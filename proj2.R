@@ -212,12 +212,6 @@ d<-dloops(50,10000)
 ## a loop of length l, l=51,52,...,100 in a random shuffling of 100 cards, i.e.
 p_under_50=1-sum(d[51:100])
 p_under_50
-## This probability is equal to the probability that 100 prisoners succeed in 
-## finding their cards when acting under strategy 1, i.e pall(100,1,), since the
-## existence or not of a loop larger than n is what determines whether they 
-## succeed or not. As a result, we expect it to be close to 0.3333, since in 
-## theory it is equal to 1-(1/51+1/52+...+1/100)=1/3.
-
 
 ## Finally, we will try to visualize the probabilities of p-under_50 that we 
 ## calculated with a simple scatterplot
