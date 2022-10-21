@@ -2,6 +2,10 @@
 ## Github repo: https://github.com/ElliotLeishman/Group_Assignment_2.git
 ## Christos Giannikos (s2436019), Elliot Leishman (s1808740), 
 ## Patrick Renaud (s2462989)
+## Christos Giannikos (Pall Function, formatted the graph)
+## Elliot Leishman (Pone, Box_Choice and check functions & commenting up to Pall)
+## Patrick Renaud (Dloops Function and comments, value of final probability)
+
 
 ## We have 2n prisoners’ numbered between 1 and 2n. Each prisoner enters a room 
 ## filled with 2n boxes, each boxes in turn has a number between 1 and 2n inside 
@@ -148,7 +152,7 @@ Pall(50, 1, 1000);Pall(50, 2, 1000);Pall(50, 3, 1000)
 
 dloops <- function(n,nreps){
   ## This function simulates the probabilities that a loop of 1 to 2n length
-  ## that can occur within one random shuffling of boxes. It takes the inputs n 
+  ## can occur within one random shuffling of boxes. It takes the inputs n 
   ## and nreps and returns an probability vector of length 2n (loop_freq). It 
   ## first initialises a zero vector of length 2n and then for 1:nreps 
   ## iterations will generate a 2n*2n empty matrix (loops) where we can store 
@@ -160,7 +164,7 @@ dloops <- function(n,nreps){
   ## occurs in the (loop_freq) vector. Once the whole sample has been checked it
   ## will start again and continue until nreps have been reached. To end, the 
   ## function will then take the (loop_freq) vector and it will divide each 
-  ## element by the total number of loops which were found.
+  ## element by the total number of iterations which were done
   ## The function then returns us the probability vector, whose elements 
   ## represent the probability with which loops of length 1:2n occur.
   
