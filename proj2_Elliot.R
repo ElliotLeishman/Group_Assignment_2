@@ -194,7 +194,8 @@ dloops <- function(n,nreps){
       }
     }
   }
-  loop_prob<-loop_freq/sum(loop_freq) # Find probabilities from frequency
+  print(loop_freq)
+  loop_prob<-loop_freq/nreps # Find probabilities from frequency
   return(loop_prob) # Return the probability vector
 }
 
